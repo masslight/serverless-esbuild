@@ -25,6 +25,7 @@ export interface PackagerOptions {
 
 interface NodeExternalsOptions {
   allowList?: string[];
+  allowWorkspaces?: boolean;
 }
 
 export type EsbuildOptions = Omit<BuildOptions, 'watch' | 'plugins'>;

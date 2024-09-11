@@ -6,6 +6,7 @@ import type {
   findDependencies as FindDependenciesFn,
   findPackagePaths as FindPackagePathsFn,
 } from 'esbuild-node-externals/dist/utils';
+import { createAllowPredicate } from 'esbuild-node-externals/dist/utils';
 
 import { getPackager } from './packagers';
 import { findProjectRoot, findUp } from './utils';
@@ -236,7 +237,8 @@ export async function packExternalModules(this: EsbuildServerlessPlugin) {
         devDependencies: false,
         peerDependencies: false,
         optionalDependencies: false,
-        allowList: this.buildOptions.nodeExternals?.allowList ?? [],
+        allowPredicate: createAllowPredicate(this.buildOptions.nodeExternals?.allowList ?? []),
+        allowWorkspaces: false,
       });
     }
   }

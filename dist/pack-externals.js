@@ -31,8 +31,9 @@ const assert_1 = __importDefault(require("assert"));
 const path_1 = __importDefault(require("path"));
 const fs_extra_1 = __importDefault(require("fs-extra"));
 const R = __importStar(require("ramda"));
+const utils_1 = require("esbuild-node-externals/dist/utils");
 const packagers_1 = require("./packagers");
-const utils_1 = require("./utils");
+const utils_2 = require("./utils");
 const helper_1 = require("./helper");
 function rebaseFileReferences(pathToPackageRoot, moduleVersion) {
     if (/^(?:file:[^/]{2}|\.\/|\.\.\/)/.test(moduleVersion)) {
@@ -162,7 +163,7 @@ exports.nodeExternalsPluginUtilsPath = nodeExternalsPluginUtilsPath;
 // eslint-disable-next-line max-statements
 async function packExternalModules() {
     (0, assert_1.default)(this.buildOptions, 'buildOptions not defined');
-    const upperPackageJson = (0, utils_1.findUp)('package.json');
+    const upperPackageJson = (0, utils_2.findUp)('package.json');
     const { plugins } = this;
     if (plugins && plugins.map((plugin) => plugin.name).includes('node-externals')) {
         const utilsPath = nodeExternalsPluginUtilsPath();
@@ -174,7 +175,8 @@ async function packExternalModules() {
                 devDependencies: false,
                 peerDependencies: false,
                 optionalDependencies: false,
-                allowList: this.buildOptions.nodeExternals?.allowList ?? [],
+                allowPredicate: (0, utils_1.createAllowPredicate)(this.buildOptions.nodeExternals?.allowList ?? []),
+                allowWorkspaces: false,
             });
         }
     }
@@ -189,7 +191,7 @@ async function packExternalModules() {
     // Read plugin configuration
     // get the root package.json by looking up until we hit a lockfile
     // if this is a yarn workspace, it will be the monorepo package.json
-    const rootPackageJsonPath = path_1.default.join((0, utils_1.findProjectRoot)() || '', './package.json');
+    const rootPackageJsonPath = path_1.default.join((0, utils_2.findProjectRoot)() || '', './package.json');
     // get the local package.json by looking up until we hit a package.json file
     // if this is *not* a yarn workspace, it will be the same as rootPackageJsonPath
     const packageJsonPath = this.buildOptions.packagePath ||
